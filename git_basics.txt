@@ -36,17 +36,21 @@ Version control usually facilitates:
 
 ##########
 PART 1 - Setting up Git and making the first commit
-##########
-$ mkdir git-workshop
-$ cd git-workshop
 
-# 1. Tell git who you are (once per machine)
+Git commands are always on the form: "git verb", where "verb" is what we want to do.
+Help is available with either "git verb -h" or "git verb --help".
+##########
+$ mkdir git_project
+$ cd git_project
+
+# 0. Tell git who you are (once per machine)
 $ git config --global user.name "Your Name"
 $ git config --global user.email your.email@example.com
 $ git config --global color.ui auto
 $ git config --global core.editor vim
 
-#1.1. Create new project, a folder .git is created where all the files are stored.
+# 1. Create new project, a folder .git is created where all the files are stored.
+# The .git folder will be hidden, but can be seen using ls -a.
 $ git init
 
 # 2. Make a new file
@@ -68,16 +72,22 @@ $ git status
 # 6. commit
 $ git commit -m "Added new.txt."
 
+# If "-m" is omitted, your chosen text editor is opened, allowing you to type the message there.
+# Good commit messages start with a brief (<50 characters) summary of changes made in the commit.
+#If you want to go into more detail, add a blank line between the summary line and your additional notes.
+
 # 7. See the history
 $ git log
 
-# 8. Add a nice alias for log (don't type newlines, all on one line 1)
+# 8. Add a nice alias for log (don't type newlines, all on one line)
 $ git config --global alias.l "log
     --graph
     --pretty=oneline
     --abbrev-commit
     --decorate"
 $ git l
+
+# 9. "gitk" is a way to look at the git log in a GUI
 $ gitk
 
 ##########
@@ -101,7 +111,8 @@ $ git status
 $ git diff
 
 # 3. Undo your change, line2 is removed, nothing to commit
-$ git checkout new.txt
+# Note the use of "--" to indicate that the next parameter is a file (or a folder).
+$ git checkout -- new.txt
 $ git status
 
 # 4. Re-add line 2 and now stage the change
@@ -122,7 +133,7 @@ $ git reset new.txt
 $ git status
 
 # 8. Undo the change, line2 is removed, nothing to commit
-$ git checkout new.txt
+$ git checkout -- new.txt
 $ git status
 
 ##########
@@ -155,7 +166,7 @@ $ git status
 $ ls
 
 # 6. Restore new.txt in working copy (both in the git project and in the folder)
-$ git checkout new.txt
+$ git checkout  -- new.txt
 $ git status
 $ ls
 
