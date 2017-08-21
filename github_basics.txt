@@ -1,0 +1,35 @@
+#1. Create a new GitHub repository
+Click button "New repository"
+Choose a suitable name: short, memorable and preferrably slightly related to the content of the repository.
+Add a description to (optional).
+(Public/Private choice is only open to paying users).
+Select to add a README if this is the initial creation of the project.
+Select .gitignore if there are files you don't want to include in the project (e.g. data files).
+Select license if the project is intended to be published and shared with a larger audience.
+
+#1.5 Add SSH key (Makes life a little easier, but is not required).
+# I had problems using cloning by ssh through proxy, suggest using HTTPS.
+$ ssh-keygen -t rsa -b 4096 -C "email@domain"
+    Accept default file location (press <enter>)
+    Add passphrase (optional) and confirm it.
+$ eval "$(ssh-agent -s)"
+$ ssh-add ~/.ssh/id_rsa
+
+Open the ssh-file ~/.ssh/id_rsa.pub and copy the contents to the clipboard (everything in the file).
+
+On the GitHub page, click profile photo and select "Settings".
+Click "SSH and GPG keys".
+Click "New SSH key".
+In the "Title" field, add a descriptive label for the new key. For example, if you're using a personal Mac, you might call this key "Personal MacBook Air".
+Paste your key into the "Key" field. 
+Click Add SSH key.
+If prompted, confirm your GitHub password. 
+
+
+#2. Clone the repository and start working on it.
+Click button "Clone or download".
+Choose "Clone with SSH" or "Clone with HTTPS". Depends on whether SSH key has been installed.
+
+#3. Send updates to GitHub repository
+# 
+$ git push origin master

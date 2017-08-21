@@ -1,0 +1,10 @@
+# Collaborating with GitHub
+#1. Create a new repository on GitHub
+#2. Clone repository to your own computer
+#3. Add a file to your local project and fill it with some content.
+#4. Push the changes back to GitHub
+#5. Team up with a partner, both of you will add the other as collaborator on your repository.
+#6. Clone your partners repository
+#7. Make some changes to the content of the file.
+#8. Push the changes back to GitHub
+#9. Observe the changes made to your project by your partner.
