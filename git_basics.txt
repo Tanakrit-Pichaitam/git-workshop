@@ -1,0 +1,418 @@
+Sources:
+http://www.draconianoverlord.com/git-workshop.html
+http://imagej.net/Git_workshop
+##########
+PART 0 - Motivation
+##########
+
+What is a version control system, why should I care?
+
+A version control system is a database that holds multiple revisions of a 
+project. A revision consists of:
+
+    the file names and contents (excluding the generated files) as well as 
+	their directory structure
+    the author
+    the committer
+    the author date
+    the commit date
+    a description (commit message) what the change leading to this revision is 
+	about, usually divided into the first line (subject) and the more 
+	verbose rest (body)
+    zero, one or more pointers to revisions preceding the current one
+
+In Git, a commit refers to a revision.
+
+Version control usually facilitates:
+
+    easy backup
+    easy retrieval of specific revisions
+    documentation (who did what when and why?)
+    documentation (how do I do ...?)
+    easy synchronization (staying up-to-date, integrating changes between 
+	multiple developers/machines)
+    finding the changes introducing regressions (AKA bugs) efficiently
+
+
+##########
+PART 1 - Setting up Git and making the first commit
+##########
+$ mkdir git-workshop
+$ cd git-workshop
+
+# 1. Tell git who you are (once per machine)
+$ git config --global user.name "Your Name"
+$ git config --global user.email your.email@example.com
+$ git config --global color.ui auto
+$ git config --global core.editor vim
+
+#1.1. Create new project, a folder .git is created where all the files are stored.
+$ git init
+
+# 2. Make a new file
+$ echo "line1" > new.txt
+
+# 3. See your status, new.txt is untracked
+$ git status
+
+# 4. Stage the new file
+$ git add new.txt
+
+# 5. git status, new.txt is "to be committed"
+$ git status
+
+# Think of "svn commit file1 file2", in git this
+# is "add file1", "add file2", "commit". Staging,
+# then committing.
+
+# 6. commit
+$ git commit -m "Added new.txt."
+
+# 7. See the history
+$ git log
+
+# 8. Add a nice alias for log (don't type newlines, all on one line 1)
+$ git config --global alias.l "log
+    --graph
+    --pretty=oneline
+    --abbrev-commit
+    --decorate"
+$ git l
+$ gitk
+
+##########
+PART 2 - Diff, Undo Line Changes
+What are diffs?
+    a pseudo command line starting with diff --git
+    a line describing the previous revision, starting with ---
+    a line describing the next revision, starting with +++
+    one or more hunks starting with @@ -<begin line>,<line count>
+	+<begin line>,<line count>
+    a corresponding block of lines starting with a space for lines in both 
+	the previous and next revision, a minus for lines only in the previous
+	one (removed line) and a plus for lines only in the next revision
+	(added line). A modified line will show up as removed and added.
+##########
+# 1. Add a line to new.txt, see the status
+$ echo "line2" >> new.txt
+$ git status
+
+# 2. See the change
+$ git diff
+
+# 3. Undo your change, line2 is removed, nothing to commit
+$ git checkout new.txt
+$ git status
+
+# 4. Re-add line 2 and now stage the change
+$ echo "line2" >> new.txt
+$ git add new.txt
+
+# 5. See the staged change
+$ git diff --staged
+
+# 6. Note regular diff does not show changes
+$ git diff
+
+# diff          == working <-> staged
+# diff --staged == staged <-> HEAD
+
+# 7. Unstage the change, new.txt is back to modified
+$ git reset new.txt
+$ git status
+
+# 8. Undo the change, line2 is removed, nothing to commit
+$ git checkout new.txt
+$ git status
+
+##########
+PART 3 - Diff, Undo File Changes
+##########
+# 1. Add, stage a new file, see it staged
+$ echo "line1" > new-b.txt
+$ git add new-b.txt
+$ git status
+
+# 2. Unstage the new file, new-b.txt is back to untracked
+$ git reset new-b.txt
+$ git status
+$ rm new-b.txt
+
+# 3. Remove new.txt, it is shown as deleted
+# Removing files from the folder does not automatically remove them from the project
+$ rm new.txt
+$ git status
+
+# 4. Stage the removal, it is shown as "to be committed"
+$ git rm new.txt
+$ git status
+
+# 5. Unstage the removal (HEAD is important, try without it)
+$ git reset HEAD new.txt
+$ git status
+
+# 5.1. The file is still deleted from the folder
+$ ls
+
+# 6. Restore new.txt in working copy (both in the git project and in the folder)
+$ git checkout new.txt
+$ git status
+$ ls
+
+##########
+Part 4 - Local Branches
+Introduction: 
+	How to apply experimental/untested changes to a project without
+	causing problems for the main (working) project?
+	Solution is to use branches, i.e. making a copy of the main project,
+	and add all changes to that. Then, when things are correct and working
+	on the branch, merge this branch with the master project.
+##########
+
+# 0. Git can be told to ignore certain files by creating and committing the file 
+# ".gitignore" in the folder
+$ echo "*.log" > .gitignore
+$ git commit -a -m "Add .gitignore."
+# (-a automatically performs git add on all changes)
+# Useful exclusions: *.pyc, *.gz, *.com, *.exe, *.sql ...
+
+# 1. See your branches
+$ git branch
+
+# 2. Make a new branch, see you're on the new one
+# -v adds more information to the output (last change),
+# notice that new.txt is added to the new branch.
+$ git checkout -b adding-b
+$ git branch -v
+
+# 3. Make a change
+$ echo "line1" > new-b.txt
+$ git add new-b.txt
+$ git commit -m "Added new-b.txt."
+
+# 4. Go back to master, change new.txt and commit 
+$ git checkout master
+$ echo "line2" >> new.txt
+$ git commit -a -m "Added line2 to new.txt."
+
+# 5. Note in git log, the adding-b changes are not in master
+$ git l
+
+# 6. Note we cannot delete adding-b, it is unmerged (i.e. unsaved changes) 
+# (although -D will force a delete)
+$ git branch -d adding-b
+
+# 7. Merge in adding-b, see the history
+# Note: the merge command wants a commit message, if -m is omitted an editor
+# will open. Type the message, save and quit.
+$ git merge adding-b
+$ cat new-b.txt
+$ git l
+
+# 8. Now we can delete adding-b branch
+$ git branch -d adding-b
+$ git branch -v
+
+#########
+Part 5 - Local Branches with Conflicts
+#########
+# 1. Make a new branch, change new.txt and new-b.txt
+$ git checkout -b changing-b
+$ echo "line3 changing-b" >> new.txt
+$ echo "line2 changing-b" >> new-b.txt
+$ git commit -a -m "Added new.txt line3, new-b.txt line2 on branch."
+
+# 2. Go back to master, change new-b.txt as well
+$ git checkout master
+$ echo "line2 master" >> new-b.txt
+$ git commit -a -m "Added new.txt line2 on master."
+
+# 3. Merge in changing-b branch, see the conflict
+$ git merge changing-b
+$ git status
+
+# Notice that new.txt (no conflicts) is already staged.
+
+# 4. See only the conflicts
+$ git diff
+
+# 5. Examine each version of new-b.txt
+$ git show :1:new-b.txt # original version
+$ git show :2:new-b.txt # master's version
+$ git show :3:new-b.txt # changing-b's version
+
+# 6. Resolve the conflicts, see what we changed
+$ echo "line1" > new-b.txt
+$ echo "line2 master and changing-b" >> new-b.txt
+$ git diff
+
+# 7. Commit, use the default commit message, (note: log shows only commit 
+# messages.)
+$ git add new-b.txt
+$ git commit
+$ git l
+$ git branch -d changing-b
+
+##########
+Part 7 - Changing History
+##########
+# 1. Add line4 with a typo, commit
+$ echo "line44" >> new.txt
+$ git commit -a -m "Added new.txt line4."
+
+# 2. Note our history
+$ git l
+# sha-a "Added new.txt line4."
+
+# 3. Fix our typo, amend the commit
+$ sed -i s/line44/line4/ new.txt
+$ git commit -a --amend
+
+# 4. Note history, there is one, different "line4" commit (notice that the
+# commit-ID has changed)
+$ git l
+# sha-a' "Added new.txt line4."
+
+# commit sha = hash(timestamp, author, message, repo contents)
+# IMPORTANT: amending always changing the last commit's sha
+
+# 5. Change new, new-b in separate commits
+$ echo "line5" >> new.txt
+$ git commit -a -m "Added new line5."
+$ echo "line3" >> new-b.txt
+$ git commit -a -m "Added new-b line3."
+
+# 6. Rebase to re-order the commits (the "~2" refers to the second commit, 
+# counting from the most current.)
+$ git rebase -i HEAD~2
+
+# oldest is listed first
+# pick sha-a "Added new line5."
+# pick sha-b "Added new-b line3."
+
+# Change order of lines:
+# pick sha-b "Added new-b line3."
+# pick sha-a "Added new line5."
+
+# Save/quit
+
+# 7. Note history
+$ git l
+
+# 8. We screwed up, pretend line3/line5 never happened
+$ git reflog
+
+# Shows what "HEAD" was X commits ago
+# Find 'commit (amend): Added line4'
+
+$ git reset --hard HEAD@{N}
+$ cat new.txt   # no line5
+$ cat new-b.txt # new line3
+
+###########
+Part 8 - Local Branches with Rebasing
+Instead of merging, changes in a branch can also be added to the main by
+rebasing. In this case the changes are applied to the last shared commit.
+The main effect, after everything has resolved, is a cleaner looking history,
+without forks.
+NB! Do not rebase commits that exist outside your repository.
+For more information on the difference between merging and rebasing, see
+https://git-scm.com/book/en/v2/Git-Branching-Rebasing
+###########
+# So far, each time we merged, there was a fork
+# in the history. Forks for real branches are good,
+# but each concurrent change doesn't need a fork.
+
+# 1. Checkout a new branch, change new.txt
+$ git checkout -b working
+$ echo "line5" >> new.txt
+$ git commit -a -m "Added new.txt line5."
+
+# 2. Checkout master, change new-b.txt
+$ git checkout master
+$ echo "line3" >> new-b.txt"
+$ git commit -a -m "Added new-b line3."
+
+# 3. Go back to working, note the fork
+$ git checkout working
+$ git l working master
+
+# 4. Rebase your work on top of master, no more fork
+$ git rebase master
+$ git l working master
+
+# 5. Checkout master, merge in working
+$ git checkout master
+$ git merge working
+
+# Note in the output it said "Fast-forward".
+# Unless told --no-ff, git will avoid needless
+# merge commits
+$ git l
+# The branch working is still active, at same stage as master.
+# No (unneeded) forks
+
+#######
+Part 9 - Remote Branches with GitHub
+For more info on remotes:
+https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes
+#######
+# Two people with accounts at github.com
+
+# User 1: Create a new empty repository at github.com.
+$ mkdir git-workshop
+$ cd git-workshop
+$ git init
+$ touch README
+$ git add README
+# Create a new file and add some content.
+# Remember to "add" it so git will include it in the commit.
+$ git commit -m 'first commit'
+$ git remote add origin git@github.com:<user1>/git-workshop.git
+$ git push origin master
+
+# User 2: Fork the repository from User1's account. (go to github.com)
+$ git clone git@github.com:<user2>/git-workshop.git
+$ cd git-workshop
+$ cat README
+
+# Change README
+$ echo "from user2" >> README
+$ git commit -a -m "Updated the readme."
+
+# Push user2's change back to user2's clone
+$ git push
+
+## User 1: Pull down User2 changes and merge them.
+# Pull down user2's work
+$ git remote add user2 http://github.com/user2/git-workshop.git
+# Note, "user2" will be the shortname for the remote repository
+$ git fetch user2
+
+# Diff your master to user2's master
+$ git diff master..user2/master
+
+# Merge user2's changes
+$ git merge user2/master
+
+# Add your own change to README
+$ echo "from user1" >> README
+$ git commit -a -m "Updated the readme."
+
+# Push the changes to your user1 repo
+$ git push
+
+## User 2: Pull in user1's changes.
+# Pull down user1's work
+$ git remote add user1 http://github.com/user2/git-workshop.git
+$ git fetch user1
+
+# Diff against what they added
+$ git diff master..user1/master
+
+# Merge user1's changes
+$ git merge user1/master
+$ cat README
+
+# Push their changes out to your user2 repo
+$ git push
