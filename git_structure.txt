@@ -1,0 +1,19 @@
+    |---------commit -a------------->|
+    |              |                 |
+    |--add (-u)--->|-----commit----->|
+    |              |                 |
+    |              |                 |---------push---------->|
+    |              |                 |                        |
+workspace   staging_area/index  local_repository        remote_repository
+    |              |                 |                        |
+    |<----------------pull or rebase--------------------------|
+    |              |                 |                        |
+    |              |                 |<--------fetch----------|
+    |              |                 |
+    |<--------checkout HEAD----------|
+    |              |                 |
+    |<--checkout---|                 |
+    |              |                 |
+    |<----------diff HEAD------------|
+    |              |
+    |<----diff-----|
