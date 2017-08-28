@@ -29,7 +29,13 @@ If prompted, confirm your GitHub password.
 #2. Clone the repository and start working on it.
 Click button "Clone or download".
 Choose "Clone with SSH" or "Clone with HTTPS". Depends on whether SSH key has been installed.
-
+$ git clone <paste https or ssh address>
+# Project will appear as a folder in your current folder.
 #3. Send updates to GitHub repository
-# 
+# When you've made the final commit and are ready to save the changes at github, you'll use git push.
+# git push <remote> <branch>
 $ git push origin master
+
+# 4. Get updates from the Github repository
+# git pull <remote> <branch>
+$ git pull origin master
